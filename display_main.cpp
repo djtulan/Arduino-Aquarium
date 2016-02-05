@@ -30,6 +30,44 @@
 
 #include "display_main.h"
 
+#define DISPLAY1_X               30
+#define DISPLAY1_Y               10
+#define DISPLAY2_X       DISPLAY1_X
+#define DISPLAY2_Y               40
+#define DISPLAY3_X       DISPLAY1_X
+#define DISPLAY3_Y               70
+#define DISPLAY4_X       DISPLAY1_X
+#define DISPLAY4_Y              100
+#define DISPLAY5_X       DISPLAY1_X
+#define DISPLAY5_Y              130
+#define DISPLAY6_X  DISPLAY5_X + 64
+#define DISPLAY6_Y       DISPLAY5_Y
+
+#define DISPLAY_W                90
+#define DISPLAY_H                20
+#define DISPLAY_SMALL_W          26
+#define DISPLAY_SMALL_H          20
+
+#define ICON1_X                   4
+#define ICON1_Y          DISPLAY1_Y
+#define ICON2_X             ICON1_X
+#define ICON2_Y          DISPLAY2_Y
+#define ICON3_X             ICON1_X
+#define ICON3_Y          DISPLAY3_Y
+#define ICON4_X             ICON1_X
+#define ICON4_Y          DISPLAY4_Y
+#define ICON5_X             ICON1_X
+#define ICON5_Y          DISPLAY5_Y
+#define ICON6_X        ICON5_X + 64
+#define ICON6_Y             ICON5_Y
+
+// const uint16_t color = Color565(0xff, 0xff, 0xff);
+static const uint16_t TEXT_COLOR = Display::Color565(0x00, 0x00, 0x00);
+static const uint16_t ON_COLOR   = Display::Color565(0x00, 0xaa, 0x00);
+static const uint16_t OFF_COLOR  = Display::Color565(0xaa, 0x00, 0x00);
+static const uint16_t BG_COLOR   = Display::Color565(0xd6, 0xd9, 0xdf);
+static const uint16_t ICON_COLOR = Display::Color565(0x4f, 0x4f, 0x4f);
+
 DisplayMain::DisplayMain() {
   tempconversion = false;
   mtime = 0;
@@ -40,38 +78,34 @@ DisplayMain::~DisplayMain() {
 }
 
 void DisplayMain::OnInit() {
-  ClearScreen();
-  SetCursor(0, 15);
+  ClearScreen(BG_COLOR);
 
-  const uint16_t color = Color565(0xcc, 0xcc, 0xcc);
-  FillRect(20, 20, 90, 20, color);
-  FillRect(20, 60, 90, 20, color);
-  FillRect(0, 100, 90, 20, color);
+  PaintDisplay(DISPLAY1_X, DISPLAY1_Y, DISPLAY_W, DISPLAY_H);
+  PaintDisplay(DISPLAY2_X, DISPLAY2_Y, DISPLAY_W, DISPLAY_H);
+  PaintDisplay(DISPLAY3_X, DISPLAY3_Y, DISPLAY_W, DISPLAY_H);
+  PaintDisplay(DISPLAY4_X, DISPLAY4_Y, DISPLAY_W, DISPLAY_H);
+  PaintDisplay(DISPLAY5_X, DISPLAY5_Y, DISPLAY_SMALL_W, DISPLAY_SMALL_H);
+  PaintDisplay(DISPLAY6_X, DISPLAY6_Y, DISPLAY_SMALL_W, DISPLAY_SMALL_H);
 
-  DrawRect(19, 19, 92, 22, 0);
-  DrawRect(19, 59, 92, 22, 0);
-  DrawRect(0,  99, 91, 22, 0);
-
-  PrintLine(F("Temperature:"));
-  PrintLine(F(""));
-  PrintLine(F("Time:"));
-  PrintLine(F(""));
-  PrintLine(F("Date:"));
-  PrintLine(F("XX.XX.XX"));
-  PrintLine(F("Free:"));
-  PrintLine(F("Free:"));
-
-  PaintIcon(0, 20, temp_icon_bits, temp_icon_width, temp_icon_height);
-  PaintIcon(0, 60, clock_icon_bits, clock_icon_width, clock_icon_height);
-
-
+  PaintIcon(ICON1_X,  ICON1_Y, temp_icon_bits,   temp_icon_width,   temp_icon_height,   ICON_COLOR);
+  PaintIcon(ICON2_X,  ICON2_Y, clock_icon_bits,  clock_icon_width,  clock_icon_height,  ICON_COLOR);
+  PaintIcon(ICON3_X,  ICON3_Y, heater_icon_bits, heater_icon_width, heater_icon_height, ICON_COLOR);
+  PaintIcon(ICON4_X,  ICON4_Y, ph_icon_bits,     ph_icon_width,     ph_icon_height,     ICON_COLOR);
+  PaintIcon(ICON5_X,  ICON5_Y, light_icon_bits,  light_icon_width,  light_icon_height,  ICON_COLOR);
+  PaintIcon(ICON6_X,  ICON6_Y, heater_icon_bits, heater_icon_width, heater_icon_height, ICON_COLOR);
 }
 
 void DisplayMain::OnLoop() {
-  const uint16_t color = Color565(0xcc, 0xcc, 0xcc);
+  static float old_temp = 0;
+  static int old_hour = 0, old_min = 0, old_sec = 0;
+  static int old_day = 0, old_month = 0, old_year = 0;
+  static float old_ph = 0;
+  static uint8_t old_light = 0xff, old_heater = 0xff;
+
+  SetTextColor(TEXT_COLOR);
 
   if (tempconversion == false) {
-    dallastemp.requestTemperaturesByIndex(0); // Temp abfragen
+    aqua.RequestTemp();
     mtime = millis();
   } else {
     if (millis() - mtime > 750) {
@@ -79,23 +113,101 @@ void DisplayMain::OnLoop() {
     }
   }
 
+  // ========================
   // paint new temp
-  float temp = dallastemp.getTempCByIndex(0);
-  FillRect(20, 20, 90, 20, color);
-  SetCursor(20, 35); Print(temp); Print(F("\xB0")); Print(F("C"));
+  // ========================
+  float temp = aqua.GetTempValue();
 
-  // paint new time
+  if (temp != old_temp) {
+    ClearDisplay(DISPLAY1_X, DISPLAY1_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY1_X + 12, DISPLAY1_Y + 15);
+    Print(temp);
+    Print(F("\xB0"));
+    Print(F("C"));
+
+    old_temp = temp;
+  }
+
   char buffer[32];
-  snprintf(buffer, 30, "%.2d:%.2d:%.2d", hour(), minute(), second());
-  FillRect(20, 60, 90, 20, color);
-  SetCursor(20, 75); Print(buffer);
 
-  snprintf(buffer, 30, "%.2d.%.2d.%.2d", day(), month(), year());
-  FillRect(0, 100, 90, 20, color);
-  SetCursor(0, 115); Print(buffer);
+  // ========================
+  // paint new time
+  // ========================
+  if (hour() != old_hour || minute() != old_min || second() != old_sec) {
+    snprintf(buffer, 30, "%.2d:%.2d:%.2d", hour(), minute(), second());
+    ClearDisplay(DISPLAY2_X, DISPLAY2_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY2_X + 10, DISPLAY2_Y + 15);
+    Print(buffer);
 
-  // paint
-  //snprintf(buffer, 30, "%d", after - before);
-  FillRect(0, 140, 90, 20, color);
-  SetCursor(50, 155); Print(buffer);
+    old_hour = hour();
+    old_min = minute();
+    old_sec = second();
+  }
+
+  // ========================
+  // paint new date
+  // ========================
+  if (day() != old_day || month() != old_month || year() != old_year) {
+    snprintf(buffer, 30, "%.2d.%.2d.%.2d", day(), month(), year());
+    ClearDisplay(DISPLAY3_X, DISPLAY3_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY3_X, DISPLAY3_Y + 15);
+    Print(buffer);
+
+    old_day = day();
+    old_month = month();
+    old_year = year();
+  }
+
+  // ========================
+  // paint new ph
+  // ========================
+  float ph = aqua.GetpHValue();
+
+  if (ph != old_ph) {
+    ClearDisplay(DISPLAY4_X, DISPLAY4_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY4_X + 25, DISPLAY4_Y + 15);
+    Print(ph);
+
+    old_ph = ph;
+  }
+
+  // ========================
+  // paint new light
+  // ========================
+  uint8_t light = aqua.GetLightState();
+
+  if (light != old_light) {
+    ClearDisplay(DISPLAY5_X, DISPLAY5_Y, DISPLAY_SMALL_W, DISPLAY_SMALL_H);
+    SetCursor(DISPLAY5_X, DISPLAY5_Y + 15);
+
+    if (light == 0) {
+      SetTextColor(OFF_COLOR);
+      Print(F("off"));
+    } else {
+      SetTextColor(ON_COLOR);
+      Print(F("on"));
+    }
+
+    old_light = light;
+  }
+
+  // ========================
+  // paint new heater
+  // ========================
+  uint8_t heater = aqua.GetHeaterState();
+
+  if (heater != old_heater) {
+    ClearDisplay(DISPLAY6_X, DISPLAY6_Y, DISPLAY_SMALL_W, DISPLAY_SMALL_H);
+    SetCursor(DISPLAY6_X, DISPLAY6_Y + 15);
+
+    if (heater == 0) {
+      SetTextColor(OFF_COLOR);
+      Print(F("off"));
+    } else {
+      SetTextColor(ON_COLOR);
+      Print(F("on"));
+    }
+
+    old_heater = heater;
+  }
 }

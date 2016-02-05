@@ -54,8 +54,8 @@ Display::Display() {
 Display::~Display() {
 }
 
-void Display::ClearScreen() {
-  tft.fillScreen(ST7735_WHITE);
+void Display::ClearScreen(uint16_t color) {
+  tft.fillScreen(color);
 }
 
 void Display::FillRect(int x, int y, int w, int h, uint16_t color) {
@@ -78,6 +78,10 @@ void Display::SetCursor(int x, int y) {
   tft.setCursor(x, y);
 }
 
+void Display::SetTextColor(uint16_t color) {
+  tft.setTextColor(color);
+}
+
 size_t Display::Print(float val) {
   return tft.print(val);
 }
@@ -90,6 +94,18 @@ size_t Display::Print(const char *txt) {
   return tft.print(txt);
 }
 
+void Display::PaintDisplay(int16_t x, int16_t y, int16_t w, int16_t h) {
+  tft.fillRect(x, y, w, h, ST7735_WHITE);
+  tft.drawRect(x-1, y-1, w+2, h+2, tft.color565(0xc0, 0xc0, 0xc1));
+  tft.drawFastHLine(x-1, y-1, w+2, tft.color565(0x8d, 0x8e, 0x8f));
+
+  tft.drawFastHLine(x, y, w, tft.color565(0xcb, 0xcb, 0xcb));
+  tft.drawFastHLine(x+1, y+1, w, tft.color565(0xe5, 0xe5, 0xe6));
+}
+
+void Display::ClearDisplay(int16_t x, int16_t y, int16_t w, int16_t h) {
+  tft.fillRect(x, y+2, w, h-2, ST7735_WHITE);
+}
 
 /*
  f o*r (int i = 0; i < 0x10; i++) {
@@ -117,6 +133,7 @@ size_t Display::Print(const char *txt) {
    }
    */
 
-void Display::PaintIcon(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h) {
-  tft.drawXBitmap(x, y, bitmap, w, h, ST7735_BLACK);
+void Display::PaintIcon(int16_t x, int16_t y, const uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color) {
+  tft.drawXBitmap(x, y, bitmap, w, h, color);
 }

@@ -23,10 +23,6 @@
 #ifndef _AQUARIUM_H_
 #define _AQUARIUM_H_
 
-// includes for temp
-#include <OneWire.h>
-#include <DallasTemperature.h>
-
 #include "display.h"
 
 class Aquarium {
@@ -53,13 +49,34 @@ class Aquarium {
 
     void setDisplay(Display *dsp);
 
+    void RequestTemp();
+
+    float GetTempValue();
+
+    float GetpHValue();
+
+    uint8_t GetLightState();
+
+    uint8_t GetHeaterState();
+
   private:
+    void CheckTemp();
+    void CheckTime();
+
+    void OnHeaterOn();
+    void OnHeaterOff();
+
+    void OnLightOn();
+    void OnLightOff();
+
     Display *display;
+    uint8_t heater;
+    uint8_t light;
+    float temp;
 };
 
 /// aquarium object
 extern Aquarium aqua;
-/// temperature sensor object
-extern DallasTemperature dallastemp;
 
 #endif
+

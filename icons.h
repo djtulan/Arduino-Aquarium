@@ -22,11 +22,22 @@
 //=============================================================================
 #include <Arduino.h>
 
-#define temp_icon_width 20
-#define temp_icon_height 20
-extern const uint8_t temp_icon_bits[] PROGMEM;
-
 #define clock_icon_width 20
 #define clock_icon_height 20
 extern const uint8_t clock_icon_bits[] PROGMEM;
 
+#define heater_icon_width 20
+#define heater_icon_height 20
+extern const uint8_t heater_icon_bits[] PROGMEM;
+
+#define light_icon_width 20
+#define light_icon_height 20
+extern const uint8_t light_icon_bits[] PROGMEM;
+
+#define ph_icon_width 20
+#define ph_icon_height 20
+extern const uint8_t ph_icon_bits[] PROGMEM;
+
+#define temp_icon_width 20
+#define temp_icon_height 20
+extern const uint8_t temp_icon_bits[] PROGMEM;

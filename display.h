@@ -35,21 +35,26 @@ class Display {
     virtual void OnInit() = 0;
     virtual void OnLoop() = 0;
 
-    void ClearScreen();
+    void ClearScreen(uint16_t color);
 
     void FillRect(int x, int y, int w, int h, uint16_t color);
     void DrawRect(int x, int y, int w, int h, uint16_t color);
 
-    uint16_t Color565(uint8_t r, uint8_t g, uint8_t b);
+    static uint16_t Color565(uint8_t r, uint8_t g, uint8_t b);
 
     void SetCursor(int x, int y);
+    void SetTextColor(uint16_t color);
 
     size_t PrintLine(const __FlashStringHelper *txt);
     size_t Print(float val);
     size_t Print(const __FlashStringHelper *txt);
     size_t Print(const char *txt);
 
-    void PaintIcon(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h);
+    void PaintIcon(int16_t x, int16_t y, const uint8_t *bitmap,
+                   int16_t w, int16_t h, uint16_t color);
+
+    void PaintDisplay(int16_t x, int16_t y, int16_t w, int16_t h);
+    void ClearDisplay(int16_t x, int16_t y, int16_t w, int16_t h);
 };
 
 #endif

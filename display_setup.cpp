@@ -37,7 +37,7 @@ DisplaySetup::~DisplaySetup() {
 }
 
 void DisplaySetup::OnInit() {
-  ClearScreen();
+  ClearScreen(Color565(0xd6, 0xd9, 0xdf));
   SetCursor(0, 15);
   PrintLine(F("SETUP:"));
   PrintLine(F(""));

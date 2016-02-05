@@ -26,6 +26,9 @@
 #include <Time.h>
 #include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
 
+// includes for temp
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #include "display_main.h"
 #include "aquarium.h"
@@ -64,10 +67,13 @@ void loop() {
 
 Aquarium::Aquarium() {
   display = NULL;
+  heater = 0;
+  light = 0;
+  temp = 0.0;
 }
 
 Aquarium::~Aquarium() {
-  delete (display);
+  delete(display);
 }
 
 void Aquarium::begin() {
@@ -77,11 +83,80 @@ void Aquarium::begin() {
 void Aquarium::loop() {
   if (display)
     display->OnLoop();
+
+  // Heater Routine
+  CheckTemp();
+
+  // Light Routine
+  CheckTime();
 }
 
 void Aquarium::setDisplay(Display *dsp) {
-  delete (display);
+  delete(display);
   display = dsp;
 
   display->OnInit();
+}
+
+void Aquarium::RequestTemp() {
+  dallastemp.requestTemperaturesByIndex(0); // Temp abfragen mnjh
+}
+
+float Aquarium::GetTempValue() {
+  temp = dallastemp.getTempCByIndex(0);
+  return temp;
+}
+
+float Aquarium::GetpHValue() {
+  return 7.10;
+}
+
+uint8_t Aquarium::GetLightState() {
+  return light;
+}
+
+uint8_t Aquarium::GetHeaterState() {
+  return heater;
+}
+
+void Aquarium::CheckTemp() {
+
+  if (heater == 1 && temp > 25.00) {
+
+    OnHeaterOff();
+
+  } else if (heater == 0 && temp < 24.00) {
+
+    OnHeaterOn();
+
+  }
+}
+
+void Aquarium::CheckTime() {
+  int h = hour();
+
+  if (light == 1 && h >= 23) {
+
+    OnLightOff();
+
+  } else if (light == 0 && h >= 9 && h <= 22) {
+
+    OnLightOn();
+  }
+}
+
+void Aquarium::OnHeaterOn() {
+  heater = 1;
+}
+
+void Aquarium::OnHeaterOff() {
+  heater = 0;
+}
+
+void Aquarium::OnLightOn() {
+  light = 1;
+}
+
+void Aquarium::OnLightOff() {
+  light = 0;
 }
