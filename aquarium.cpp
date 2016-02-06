@@ -50,7 +50,7 @@ void setup() {
   Display::Init();
 
   setSyncProvider(RTC.get); // the function to get the time from the RTC
-  setTime(1453242148);
+  setTime(1453240148);
 
   dallastemp.begin(); // Inizialisieren der Dallas Temperature library
   dallastemp.setWaitForConversion(false);
@@ -135,13 +135,14 @@ void Aquarium::CheckTemp() {
 void Aquarium::CheckTime() {
   int h = hour();
 
-  if (light == 1 && h >= 23) {
+  if (light == 1 && (h >= 22 || h < 9 )) {
 
     OnLightOff();
 
-  } else if (light == 0 && h >= 9 && h <= 22) {
+  } else if (light == 0 && (h >= 9 && h < 22)) {
 
     OnLightOn();
+
   }
 }
 
