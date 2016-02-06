@@ -38,6 +38,12 @@
 PDQ_ST7735 tft; // PDQ: create LCD object
 // ===================================================
 
+const uint16_t Display::TEXT_COLOR = Display::Color565(0x00, 0x00, 0x00);
+const uint16_t Display::ON_COLOR   = Display::Color565(0x00, 0xaa, 0x00);
+const uint16_t Display::OFF_COLOR  = Display::Color565(0xaa, 0x00, 0x00);
+const uint16_t Display::BG_COLOR   = Display::Color565(0xd6, 0xd9, 0xdf);
+const uint16_t Display::ICON_COLOR = Display::Color565(0x4f, 0x4f, 0x4f);
+
 void Display::Init() {
   tft.begin(); // initialize LCD
 

@@ -55,6 +55,12 @@ class Display {
 
     void PaintDisplay(int16_t x, int16_t y, int16_t w, int16_t h);
     void ClearDisplay(int16_t x, int16_t y, int16_t w, int16_t h);
+
+    static const uint16_t TEXT_COLOR;
+    static const uint16_t ON_COLOR;
+    static const uint16_t OFF_COLOR;
+    static const uint16_t BG_COLOR;
+    static const uint16_t ICON_COLOR;
 };
 
 #endif

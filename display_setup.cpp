@@ -24,12 +24,11 @@
 
 #include "aquarium.h"
 
-#include "display_main.h"
+#include "display_menu.h"
 
 #include "display_setup.h"
 
 DisplaySetup::DisplaySetup() {
-  count = 0;
 }
 
 DisplaySetup::~DisplaySetup() {
@@ -67,8 +66,9 @@ void DisplaySetup::OnLoop() {
   // tft.fillRect(0, 100, 90, 20, tft.color565(0xcc, 0xcc, 0xcc));
   // SetCursor(0, 115); Print(buffer);
 
-  count ++;
-
-  if (count == 1000)
-    aqua.setDisplay(new DisplayMain);
+  if (aqua.GetButtons() == Aquarium::BUTTON_EXIT) {
+    while (aqua.GetButtons())
+      ;
+    aqua.setDisplay(new DisplayMenu());
+  }
 }

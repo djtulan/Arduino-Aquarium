@@ -26,7 +26,7 @@
 #include "aquarium.h"
 #include "icons.h"
 
-#include "display_setup.h"
+#include "display_menu.h"
 
 #include "display_main.h"
 
@@ -61,16 +61,15 @@
 #define ICON6_X        ICON5_X + 64
 #define ICON6_Y             ICON5_Y
 
-// const uint16_t color = Color565(0xff, 0xff, 0xff);
-static const uint16_t TEXT_COLOR = Display::Color565(0x00, 0x00, 0x00);
-static const uint16_t ON_COLOR   = Display::Color565(0x00, 0xaa, 0x00);
-static const uint16_t OFF_COLOR  = Display::Color565(0xaa, 0x00, 0x00);
-static const uint16_t BG_COLOR   = Display::Color565(0xd6, 0xd9, 0xdf);
-static const uint16_t ICON_COLOR = Display::Color565(0x4f, 0x4f, 0x4f);
-
 DisplayMain::DisplayMain() {
   tempconversion = false;
   mtime = 0;
+
+  old_temp = 0;
+  old_sec = 0;
+  old_day = 0;
+  old_ph = 0;
+  old_light = 0xff, old_heater = 0xff;
 }
 
 DisplayMain::~DisplayMain() {
@@ -96,12 +95,6 @@ void DisplayMain::OnInit() {
 }
 
 void DisplayMain::OnLoop() {
-  static float old_temp = 0;
-  static int old_hour = 0, old_min = 0, old_sec = 0;
-  static int old_day = 0, old_month = 0, old_year = 0;
-  static float old_ph = 0;
-  static uint8_t old_light = 0xff, old_heater = 0xff;
-
   SetTextColor(TEXT_COLOR);
 
   if (tempconversion == false) {
@@ -133,29 +126,25 @@ void DisplayMain::OnLoop() {
   // ========================
   // paint new time
   // ========================
-  if (hour() != old_hour || minute() != old_min || second() != old_sec) {
+  if (second() != old_sec) {
     snprintf(buffer, 30, "%.2d:%.2d:%.2d", hour(), minute(), second());
     ClearDisplay(DISPLAY2_X, DISPLAY2_Y, DISPLAY_W, DISPLAY_H);
     SetCursor(DISPLAY2_X + 10, DISPLAY2_Y + 15);
     Print(buffer);
 
-    old_hour = hour();
-    old_min = minute();
     old_sec = second();
   }
 
   // ========================
   // paint new date
   // ========================
-  if (day() != old_day || month() != old_month || year() != old_year) {
+  if (day() != old_day) {
     snprintf(buffer, 30, "%.2d.%.2d.%.2d", day(), month(), year());
     ClearDisplay(DISPLAY3_X, DISPLAY3_Y, DISPLAY_W, DISPLAY_H);
     SetCursor(DISPLAY3_X, DISPLAY3_Y + 15);
     Print(buffer);
 
     old_day = day();
-    old_month = month();
-    old_year = year();
   }
 
   // ========================
@@ -209,5 +198,11 @@ void DisplayMain::OnLoop() {
     }
 
     old_heater = heater;
+  }
+
+  if (aqua.GetButtons()) {
+    while (aqua.GetButtons())
+      ;
+    aqua.setDisplay(new DisplayMenu());
   }
 }

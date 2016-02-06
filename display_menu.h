@@ -15,33 +15,26 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library.
 //=============================================================================
-/// @file   display_main.h
+/// @file   display_menu.h
 /// @author Robert Grasböck (robert.grasboeck@gmail.com)
 /// @date   January, 2016
-/// @brief  Display Main Class
+/// @brief  Display Menu Class
 //=============================================================================
-#ifndef _DISPLAY_MAIN_H_
-#define _DISPLAY_MAIN_H_
+#ifndef _DISPLAY_MENU_H_
+#define _DISPLAY_MENU_H_
 
 #include "display.h"
 
-class DisplayMain : public Display {
+class DisplayMenu : public Display {
   public:
-    DisplayMain();
-    ~DisplayMain();
+    DisplayMenu();
+    ~DisplayMenu();
 
     virtual void OnInit();
     virtual void OnLoop();
 
   private:
-    long unsigned int mtime;
-    bool tempconversion;
-
-    float old_temp;
-    int old_sec;
-    int old_day;
-    float old_ph;
-    uint8_t old_light, old_heater;
+    uint8_t focus;
 };
 
 #endif

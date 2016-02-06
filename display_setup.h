@@ -34,7 +34,6 @@ class DisplaySetup : public Display {
     virtual void OnLoop();
 
   private:
-    uint16_t count;
 };
 
 #endif

@@ -59,6 +59,14 @@ class Aquarium {
 
     uint8_t GetHeaterState();
 
+    enum ButtonMasks {
+      BUTTON_EXIT = 1,
+      BUTTON_DEC = 2,
+      BUTTON_INC = 4,
+      BUTTON_SET = 8,
+    };
+    uint8_t GetButtons();
+
   private:
     void CheckTemp();
     void CheckTime();
@@ -69,14 +77,32 @@ class Aquarium {
     void OnLightOn();
     void OnLightOff();
 
+    void LoadSetup();
+    void SaveSetup();
+
+    void SerialDebug();
+
     Display *display;
     uint8_t heater;
     uint8_t light;
     float temp;
+
+    /// \brief setup stored on the EEPROM
+    struct SETUP {
+      uint8_t magic1;
+      uint8_t hour_on;
+      uint8_t min_on;
+      uint8_t hour_off;
+      uint8_t min_off;
+      uint8_t temp_high;
+      uint8_t temp_low;
+      uint8_t magic2;
+      uint8_t chksum;
+    };
+    SETUP setup;
 };
 
 /// aquarium object
 extern Aquarium aqua;
 
 #endif
-
