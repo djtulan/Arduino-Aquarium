@@ -1,0 +1,4 @@
+Reference, Value, Footprint, Datasheet
+J1,Arduino Nano,w_conn_misc:arduino_nano_header,
+U1,DS18B20,TO_SOT_Packages_THT:TO-92_Inline_Narrow_Oval,
+R1,4.7k,Resistors_ThroughHole:Resistor_Horizontal_RM7mm,

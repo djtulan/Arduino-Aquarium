@@ -221,10 +221,10 @@ void Aquarium::LoadSetup() {
     setup.magic1 = 0x12;
     setup.hour_on = 9;
     setup.min_on = 0;
-    setup.hour_off = 20;
+    setup.hour_off = 22;
     setup.min_off = 0;
-    setup.temp_high = 25;
-    setup.temp_low = 22;
+    setup.temp_high = 24;
+    setup.temp_low = 21;
     setup.magic2 = 0x34;
     setup.chksum = 0;
 
@@ -251,19 +251,24 @@ void Aquarium::SaveSetup() {
 }
 
 void Aquarium::SerialDebug() {
-  Serial.println("===================");
-  Serial.print("Temp            = "); Serial.println(GetTempValue());
-  Serial.print("PH              = "); Serial.println(GetpHValue());
-  Serial.print("Light           = "); Serial.println(GetLightState());
-  Serial.print("Heater          = "); Serial.println(GetHeaterState());
-  Serial.print("Setup.magic1    = "); Serial.println(setup.magic1);
-  Serial.print("Setup.hour_on   = "); Serial.println(setup.hour_on);
-  Serial.print("Setup.min_on    = "); Serial.println(setup.min_on);
-  Serial.print("Setup.hour_off  = "); Serial.println(setup.hour_off);
-  Serial.print("Setup.min_off   = "); Serial.println(setup.min_off);
-  Serial.print("Setup.temp_high = "); Serial.println(setup.temp_high);
-  Serial.print("Setup.temp_low  = "); Serial.println(setup.temp_low);
-  Serial.print("Setup.magic2    = "); Serial.println(setup.magic2);
-  Serial.print("Setup.chksum    = "); Serial.println(setup.chksum);
-  Serial.println("===================");
+
+  if (Serial.available()) {
+    Serial.read();
+
+    Serial.println("===================");
+    Serial.print("Temp            = "); Serial.println(GetTempValue());
+    Serial.print("PH              = "); Serial.println(GetpHValue());
+    Serial.print("Light           = "); Serial.println(GetLightState());
+    Serial.print("Heater          = "); Serial.println(GetHeaterState());
+    Serial.print("Setup.magic1    = "); Serial.println(setup.magic1);
+    Serial.print("Setup.hour_on   = "); Serial.println(setup.hour_on);
+    Serial.print("Setup.min_on    = "); Serial.println(setup.min_on);
+    Serial.print("Setup.hour_off  = "); Serial.println(setup.hour_off);
+    Serial.print("Setup.min_off   = "); Serial.println(setup.min_off);
+    Serial.print("Setup.temp_high = "); Serial.println(setup.temp_high);
+    Serial.print("Setup.temp_low  = "); Serial.println(setup.temp_low);
+    Serial.print("Setup.magic2    = "); Serial.println(setup.magic2);
+    Serial.print("Setup.chksum    = "); Serial.println(setup.chksum);
+    Serial.println("===================");
+  }
 }

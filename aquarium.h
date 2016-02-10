@@ -47,25 +47,62 @@ class Aquarium {
      */
     void loop();
 
+
+    /**
+     * @brief set current display object
+     * @param [in] display object
+     *
+     * A Display object is a object of the base class Display
+     * It's one screen representation
+     */
     void setDisplay(Display *dsp);
 
+
+    /**
+     * @brief Request temperature from Dallas sensor
+     */
     void RequestTemp();
 
+    /**
+     * @brief Get Temp of Dallas sensor after requesting it
+     * @return current temperature value
+     */
     float GetTempValue();
 
+    /**
+     * @brief Get pH value from sensor
+     * @return current pH value (0 ... 14)
+     */
     float GetpHValue();
 
+    /**
+     * @brief Get light state
+     * @return current light state (0/1)
+     */
     uint8_t GetLightState();
 
+    /**
+     * @brief Get heater state
+     * @return current heater state (0/1)
+     */
     uint8_t GetHeaterState();
 
+
+    /// \brief button masks
     enum ButtonMasks {
-      BUTTON_EXIT = 1,
-      BUTTON_DEC = 2,
-      BUTTON_INC = 4,
-      BUTTON_SET = 8,
+      BUTTON_EXIT = 1, ///< button exit pressed mask
+      BUTTON_DEC = 2,  ///< button decrement pressed mask
+      BUTTON_INC = 4,  ///< button increment pressed mask
+      BUTTON_SET = 8,  ///< button set pressed mask
     };
+
+    /**
+     * @brief Get button state
+     * @return or'd button masks
+     */
     uint8_t GetButtons();
+
+    
 
   private:
     void CheckTemp();

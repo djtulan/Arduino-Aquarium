@@ -106,42 +106,15 @@ void DisplayMain::OnLoop() {
     }
   }
 
-  // ========================
-  // paint new temp
-  // ========================
-  float temp = aqua.GetTempValue();
-
-  if (temp != old_temp) {
-    ClearDisplay(DISPLAY1_X, DISPLAY1_Y, DISPLAY_W, DISPLAY_H);
-    SetCursor(DISPLAY1_X + 12, DISPLAY1_Y + 15);
-    Print(temp);
-    Print(F("\xB0"));
-    Print(F("C"));
-
-    old_temp = temp;
-  }
-
   char buffer[32];
-
-  // ========================
-  // paint new time
-  // ========================
-  if (second() != old_sec) {
-    snprintf(buffer, 30, "%.2d:%.2d:%.2d", hour(), minute(), second());
-    ClearDisplay(DISPLAY2_X, DISPLAY2_Y, DISPLAY_W, DISPLAY_H);
-    SetCursor(DISPLAY2_X + 10, DISPLAY2_Y + 15);
-    Print(buffer);
-
-    old_sec = second();
-  }
 
   // ========================
   // paint new date
   // ========================
   if (day() != old_day) {
     snprintf(buffer, 30, "%.2d.%.2d.%.2d", day(), month(), year());
-    ClearDisplay(DISPLAY3_X, DISPLAY3_Y, DISPLAY_W, DISPLAY_H);
-    SetCursor(DISPLAY3_X, DISPLAY3_Y + 15);
+    ClearDisplay(DISPLAY1_X, DISPLAY1_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY1_X, DISPLAY1_Y + 15);
     Print(buffer);
 
     old_day = day();
@@ -153,11 +126,38 @@ void DisplayMain::OnLoop() {
   float ph = aqua.GetpHValue();
 
   if (ph != old_ph) {
-    ClearDisplay(DISPLAY4_X, DISPLAY4_Y, DISPLAY_W, DISPLAY_H);
-    SetCursor(DISPLAY4_X + 25, DISPLAY4_Y + 15);
+    ClearDisplay(DISPLAY2_X, DISPLAY2_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY2_X + 25, DISPLAY2_Y + 15);
     Print(ph);
 
     old_ph = ph;
+  }
+
+  // ========================
+  // paint new time
+  // ========================
+  if (second() != old_sec) {
+    snprintf(buffer, 30, "%.2d:%.2d:%.2d", hour(), minute(), second());
+    ClearDisplay(DISPLAY3_X, DISPLAY3_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY3_X + 10, DISPLAY3_Y + 15);
+    Print(buffer);
+
+    old_sec = second();
+  }
+
+  // ========================
+  // paint new temp
+  // ========================
+  float temp = aqua.GetTempValue();
+
+  if (temp != old_temp) {
+    ClearDisplay(DISPLAY4_X, DISPLAY4_Y, DISPLAY_W, DISPLAY_H);
+    SetCursor(DISPLAY4_X + 12, DISPLAY4_Y + 15);
+    Print(temp);
+    Print(F("\xB0"));
+    Print(F("C"));
+
+    old_temp = temp;
   }
 
   // ========================
