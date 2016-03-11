@@ -102,7 +102,7 @@ class Aquarium {
      */
     uint8_t GetButtons();
 
-    
+
 
   private:
     void CheckTemp();
@@ -123,6 +123,7 @@ class Aquarium {
     uint8_t heater;
     uint8_t light;
     float temp;
+    int32_t encval;
 
     /// \brief setup stored on the EEPROM
     struct SETUP {
@@ -137,6 +138,9 @@ class Aquarium {
       uint8_t chksum;
     };
     SETUP setup;
+
+    // testcode
+    int counter;
 };
 
 /// aquarium object

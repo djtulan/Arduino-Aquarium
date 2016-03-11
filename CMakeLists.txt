@@ -21,7 +21,7 @@ set(${PROJECT_NAME}_BOARD atmega328)
 set(${PROJECT_NAME}_SRCS ${PROJECT_NAME}.cpp display.cpp display_main.cpp display_menu.cpp display_setup.cpp display_maintenance.cpp icons.cpp)
 
 # Define the port for uploading code to the Arduino
-set(${PROJECT_NAME}_PORT /dev/ttyUSB0)
+set(${PROJECT_NAME}_PORT /dev/ttyUSB1)
 
 # Command to generate code arduino firmware (.hex file)
 generate_arduino_firmware(${PROJECT_NAME})

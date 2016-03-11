@@ -33,6 +33,13 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+// RF sender
+#define RCSwitchDisableReceiving
+#include <RCSwitch.h>
+
+// Encoder
+#include <Encoder.h>
+
 #include "display_main.h"
 #include "aquarium.h"
 
@@ -44,12 +51,17 @@ OneWire ourWire(ONE_WIRE_BUS); /* Ini oneWire instance */
 DallasTemperature dallastemp(&ourWire);/* Dallas Temperature Library für Nutzung der oneWire Library vorbereiten */
 // ===================================================
 
-Aquarium aqua;
-
 #define BUTTON_PIN_1  3
 #define BUTTON_PIN_2  4
-#define BUTTON_PIN_3  5
-#define BUTTON_PIN_4  6
+// #define BUTTON_PIN_3  5
+// #define BUTTON_PIN_4  6
+
+Encoder myEnc(5, 6);
+
+RCSwitch mySwitch = RCSwitch();
+
+Aquarium aqua;
+
 
 /**
  * @brief arduino setup function
@@ -60,7 +72,12 @@ void setup() {
   Display::Init();
 
   setSyncProvider(RTC.get); // the function to get the time from the RTC
-  setTime(1453240148);
+  // RTC.set(1453240148);
+
+  //setTime();
+
+  // Transmitter is connected to Arduino Pin #10
+  mySwitch.enableTransmit(7);
 
   dallastemp.begin(); // Inizialisieren der Dallas Temperature library
   dallastemp.setWaitForConversion(false);
@@ -69,8 +86,8 @@ void setup() {
 
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
-  pinMode(BUTTON_PIN_3, INPUT_PULLUP);
-  pinMode(BUTTON_PIN_4, INPUT_PULLUP);
+//  pinMode(BUTTON_PIN_3, INPUT_PULLUP);
+//  pinMode(BUTTON_PIN_4, INPUT_PULLUP);
 }
 
 /**
@@ -85,6 +102,10 @@ Aquarium::Aquarium() {
   heater = 0;
   light = 0;
   temp = 0.0;
+
+  counter = 0;
+
+  myEnc.write(100);
 }
 
 Aquarium::~Aquarium() {
@@ -108,6 +129,46 @@ void Aquarium::loop() {
 
   // Light Routine
   CheckTime();
+
+  int32_t val = myEnc.read();
+  if (val != encval) {
+    Serial.println(val - encval);
+    encval = val;
+  }
+
+  // testcode
+/*
+  switch (counter) {
+    case 0:
+      mySwitch.switchOn("10101", "10000");
+      break;
+
+    case 1:
+      mySwitch.switchOn("10101", "01000");
+      break;
+
+    case 2:
+      mySwitch.switchOn("10101", "00100");
+      break;
+
+    case 3:
+      mySwitch.switchOff("10101", "10000");
+      break;
+
+    case 4:
+      mySwitch.switchOff("10101", "01000");
+      break;
+
+    case 5:
+      mySwitch.switchOff("10101", "00100");
+      break;
+  }
+
+  counter ++;
+
+  if (counter == 6)
+    counter = 0;
+  */
 }
 
 void Aquarium::setDisplay(Display *dsp) {
@@ -149,13 +210,14 @@ uint8_t Aquarium::GetButtons() {
     buttonstate |= BUTTON_DEC;
   }
 
+  /*
   if (digitalRead(BUTTON_PIN_3) == LOW) {
     buttonstate |= BUTTON_INC;
   }
 
   if (digitalRead(BUTTON_PIN_4) == LOW) {
     buttonstate |= BUTTON_SET;
-  }
+  }*/
 
   return buttonstate;
 }
@@ -205,15 +267,16 @@ void Aquarium::OnLightOff() {
 
 void Aquarium::LoadSetup() {
   // read in all bytes from EEPROM
-  for (int i=0; i<sizeof(SETUP); i++) {
+  for (int i = 0; i < sizeof(SETUP); i++) {
     uint8_t byte = EEPROM.read(i);
-    ((uint8_t*)(&setup))[i] = byte;
+    ((uint8_t *)(&setup))[i] = byte;
   }
 
   // calculate checksum
   uint8_t cs = 0;
-  for (int i=0; i<sizeof(SETUP) - 1; i++) {
-    cs |= ((uint8_t*)(&setup))[i];
+
+  for (int i = 0; i < sizeof(SETUP) - 1; i++) {
+    cs |= ((uint8_t *)(&setup))[i];
   }
 
   // if checksum or magic bytes are not ok, then reset to default values
@@ -235,19 +298,22 @@ void Aquarium::LoadSetup() {
 void Aquarium::SaveSetup() {
   uint8_t cs = 0;
 
-  for (int i=0; i<sizeof(SETUP)-1; i++) {
+  for (int i = 0; i < sizeof(SETUP) - 1; i++) {
     // read stored byte
     uint8_t byte = EEPROM.read(i);
+
     // if byte is different, then overwrite it
-    if (((uint8_t*)(&setup))[i] != byte) {
-      EEPROM.write(i, ((uint8_t*)(&setup))[i]);
+    if (((uint8_t *)(&setup))[i] != byte) {
+      EEPROM.write(i, ((uint8_t *)(&setup))[i]);
     }
-    cs |= ((uint8_t*)(&setup))[i];
+
+    cs |= ((uint8_t *)(&setup))[i];
   }
 
-  uint8_t csbyte = EEPROM.read(sizeof(SETUP)-1);
+  uint8_t csbyte = EEPROM.read(sizeof(SETUP) - 1);
+
   if (csbyte != cs)
-    EEPROM.write(sizeof(SETUP)-1, cs);
+    EEPROM.write(sizeof(SETUP) - 1, cs);
 }
 
 void Aquarium::SerialDebug() {
@@ -256,19 +322,34 @@ void Aquarium::SerialDebug() {
     Serial.read();
 
     Serial.println("===================");
-    Serial.print("Temp            = "); Serial.println(GetTempValue());
-    Serial.print("PH              = "); Serial.println(GetpHValue());
-    Serial.print("Light           = "); Serial.println(GetLightState());
-    Serial.print("Heater          = "); Serial.println(GetHeaterState());
-    Serial.print("Setup.magic1    = "); Serial.println(setup.magic1);
-    Serial.print("Setup.hour_on   = "); Serial.println(setup.hour_on);
-    Serial.print("Setup.min_on    = "); Serial.println(setup.min_on);
-    Serial.print("Setup.hour_off  = "); Serial.println(setup.hour_off);
-    Serial.print("Setup.min_off   = "); Serial.println(setup.min_off);
-    Serial.print("Setup.temp_high = "); Serial.println(setup.temp_high);
-    Serial.print("Setup.temp_low  = "); Serial.println(setup.temp_low);
-    Serial.print("Setup.magic2    = "); Serial.println(setup.magic2);
-    Serial.print("Setup.chksum    = "); Serial.println(setup.chksum);
+    Serial.print("Temp            = ");
+    Serial.println(GetTempValue());
+    Serial.print("PH              = ");
+    Serial.println(GetpHValue());
+    Serial.print("Light           = ");
+    Serial.println(GetLightState());
+    Serial.print("Heater          = ");
+    Serial.println(GetHeaterState());
+    Serial.print("Encoder         = ");
+    Serial.println(encval);
+    Serial.print("Setup.magic1    = ");
+    Serial.println(setup.magic1);
+    Serial.print("Setup.hour_on   = ");
+    Serial.println(setup.hour_on);
+    Serial.print("Setup.min_on    = ");
+    Serial.println(setup.min_on);
+    Serial.print("Setup.hour_off  = ");
+    Serial.println(setup.hour_off);
+    Serial.print("Setup.min_off   = ");
+    Serial.println(setup.min_off);
+    Serial.print("Setup.temp_high = ");
+    Serial.println(setup.temp_high);
+    Serial.print("Setup.temp_low  = ");
+    Serial.println(setup.temp_low);
+    Serial.print("Setup.magic2    = ");
+    Serial.println(setup.magic2);
+    Serial.print("Setup.chksum    = ");
+    Serial.println(setup.chksum);
     Serial.println("===================");
   }
 }
