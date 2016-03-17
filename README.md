@@ -20,3 +20,11 @@ All the hardware currently used is available very cheap on ebay.
 All the schematics will also be uploaded to folder /hardware
 The file format is for KiCAD
 
+
+# Open Issues
+
+- finish menu
+- draw schematics
+- build up everthing on a perfboard and put it into a case
+- life test
+
