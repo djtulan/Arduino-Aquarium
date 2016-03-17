@@ -43,6 +43,8 @@ void DisplayMenu::OnInit() {
   ClearScreen(BG_COLOR);
 
   SetCursor(0, 15);
+  PrintLine(F(""));
+  PrintLine(F(""));
   PrintLine(F("MENU:"));
   PrintLine(F(""));
   PrintLine(F("SETUP"));

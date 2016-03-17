@@ -52,6 +52,7 @@ void Display::Init() {
   tft.setTextColor(tft.color565(0x00, 0x00, 0x00));
 
   tft.fillScreen(ST7735_RED);
+  tft.setRotation(2);
 }
 
 Display::Display() {

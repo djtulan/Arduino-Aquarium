@@ -23,9 +23,7 @@
 
 #include <EEPROM.h>
 
-
 // includes for time
-#include <Wire.h>
 #include <Time.h>
 #include <DS1307RTC.h>  // a basic DS1307 library that returns time as a time_t
 
@@ -62,6 +60,10 @@ RCSwitch mySwitch = RCSwitch();
 
 Aquarium aqua;
 
+// MACRO TO GET
+#define t(index, multiplier)   ((__TIME__[index]-'0') * (multiplier))
+/* only minutes and seconds - you get the idea */
+#define hhmmss() (t(0,36000) + t(1,3600) + t(3,600) + t(4,60) + t(6,10) + t(7,1))
 
 /**
  * @brief arduino setup function
@@ -71,10 +73,12 @@ void setup() {
 
   Display::Init();
 
-  setSyncProvider(RTC.get); // the function to get the time from the RTC
-  // RTC.set(1453240148);
+  if (RTC.get() == 0) {
+    // following line sets the RTC to the date & time this sketch was compiled
+    RTC.set(hhmmss());
+  }
 
-  //setTime();
+  setSyncProvider(RTC.get); // the function to get the time from the RTC
 
   // Transmitter is connected to Arduino Pin #10
   mySwitch.enableTransmit(7);
